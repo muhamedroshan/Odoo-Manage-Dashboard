@@ -22,35 +22,58 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-background-light dark:bg-background-dark font-display text-slate-800 dark:text-slate-200">
-      <div className="w-full max-w-sm p-8 space-y-8 bg-white dark:bg-slate-900 rounded-lg shadow-lg">
-        <div className="text-center">
-          <div className="flex items-center justify-center mx-auto mb-4 h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/50">
-            <span className="material-symbols-outlined text-red-600 dark:text-red-400">dns</span>
+    <div className="flex items-center justify-center min-h-screen bg-slate-950 font-display relative overflow-hidden">
+      {/* Decorative Gradients */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950"></div>
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-red-600/10 rounded-full blur-[100px]"></div>
+      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-amber-600/10 rounded-full blur-[100px]"></div>
+
+      <div className="w-full max-w-md p-10 bg-slate-900/50 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl relative z-10 animate-in fade-in zoom-in duration-300">
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center mb-6 h-16 w-16 rounded-2xl bg-gradient-to-br from-red-500 to-orange-600 shadow-lg shadow-red-500/20">
+            <span className="material-symbols-outlined text-white text-3xl">dns</span>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Wedo Technologies</h1>
-          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Please log in to manage your server</p>
+          <h1 className="text-3xl font-bold text-white tracking-tight">WeDo Technologies</h1>
+          <p className="mt-2 text-slate-400">Sign in to Wedo Technologies Server</p>
         </div>
-        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="relative">
-             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">person</span>
-            <input 
-                className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400" 
-                placeholder="User" type="text" value={username} onChange={e => setUsername(e.target.value)} 
-            />
+
+        {error && (
+            <div className="mb-6 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center flex items-center justify-center gap-2">
+                <span className="material-icons text-sm">error</span> {error}
+            </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div className="space-y-1">
+             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Username</label>
+             <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors">person</span>
+                <input 
+                    className="w-full pl-12 pr-4 py-4 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-red-500/50 focus:border-red-500 text-white placeholder-slate-600 transition-all" 
+                    placeholder="Enter username" type="text" value={username} onChange={e => setUsername(e.target.value)} 
+                />
+             </div>
           </div>
-          <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">lock</span>
-            <input 
-                className="w-full pl-10 pr-4 py-3 bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-md focus:ring-yellow-500 focus:border-yellow-500 text-slate-900 dark:text-white placeholder-slate-500 dark:placeholder-slate-400" 
-                placeholder="Password" type="password" value={password} onChange={e => setPassword(e.target.value)}
-            />
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider ml-1">Password</label>
+            <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-white transition-colors">lock</span>
+                <input 
+                    className="w-full pl-12 pr-4 py-4 bg-slate-950/50 border border-slate-700/50 rounded-xl focus:ring-2 focus:ring-red-500/50 focus:border-red-500 text-white placeholder-slate-600 transition-all" 
+                    placeholder="Enter password" type="password" value={password} onChange={e => setPassword(e.target.value)}
+                />
+            </div>
           </div>
-          <button className="w-full flex items-center justify-center gap-2 bg-yellow-500 text-slate-900 font-semibold py-3 rounded-md hover:bg-yellow-400 transition-colors" type="submit">
-            <span className="material-symbols-outlined">login</span> Log In
+          
+          <button className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-600 to-orange-600 text-white font-bold py-4 rounded-xl hover:shadow-lg hover:shadow-red-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 mt-2" type="submit">
+            <span className="material-symbols-outlined">login</span> 
+            Access Server
           </button>
         </form>
+      </div>
+      
+      <div className="absolute bottom-6 text-slate-600 text-xs">
+        © 2025 Wedo Technologies. Secure System.
       </div>
     </div>
   );

@@ -1,15 +1,41 @@
 @import "tailwindcss";
 
-/* Force body to always be black */
-body {
-  background-color: #2e2e2e; /* Pure Black */
-  color: #e2e8f0; /* Light text color (slate-200) */
-  margin: 0;
-  min-height: 100vh;
-}
 
-/* Ensure the root React div is also full height */
-#root {
-  min-height: 100vh;
-  background-color: #2e2e2e;
+/* Global Styles to force Dark Background */
+@layer base {
+  :root {
+    /* Define your Custom Colors here */
+    --color-primary: #dc2626;
+    --color-secondary: #f59e0b;
+    --color-background-light: #000000; /* You wanted black for light mode */
+    --color-background-dark: #020617;  /* Slate-950 for dark mode */
+
+    /* Define your Fonts */
+    --font-display: "Roboto", sans-serif;
+    --font-mono: "Roboto Mono", monospace;
+  }
+  
+  body {
+    background-color: #020617; /* Slate-950 */
+    color: #e2e8f0; /* Slate-200 */
+    margin: 0;
+    min-height: 100vh;
+  }
+  
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background-color: #020617; 
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #334155; 
+    border-radius: 9999px;
+    border: 2px solid #020617;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #475569; 
+  }
 }

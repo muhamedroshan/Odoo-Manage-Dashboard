@@ -7,32 +7,51 @@ const Layout = ({ children }) => {
   const { logout } = useContext(AuthContext);
 
   const isActive = (path) => location.pathname === path 
-    ? "bg-primary text-white" 
-    : "text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800";
+    ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-900/20" 
+    : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50";
 
   return (
-    <div className="flex h-screen bg-background-light dark:bg-background-dark font-display">
-      <aside className="w-64 flex-shrink-0 bg-slate-100 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 flex flex-col p-6">
-        <div className="mb-8">
-           <h1 className="text-xl font-bold text-slate-800 dark:text-white">Wedo Tech</h1>
+    <div className="flex h-screen bg-slate-950 font-display overflow-hidden selection:bg-red-500/30">
+      {/* Sidebar */}
+      <aside className="w-72 flex-shrink-0 bg-slate-900/50 backdrop-blur-xl border-r border-white/5 flex flex-col p-6 relative">
+        {/* Brand */}
+        <div className="mb-10 flex items-center space-x-3 px-2">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-red-500 to-orange-600 flex items-center justify-center shadow-red-500/20 shadow-lg">
+                <span className="material-icons text-white text-sm">dns</span>
+            </div>
+            <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-400 tracking-tight">
+                Wedo Technologies
+            </h1>
         </div>
-        <nav className="flex flex-col space-y-2">
-          <Link to="/dashboard" className={`flex items-center space-x-3 px-4 py-2 rounded-lg font-medium transition-colors ${isActive('/dashboard')}`}>
-            <span className="material-icons">dashboard</span>
+
+        {/* Navigation */}
+        <nav className="flex flex-col space-y-2 flex-1">
+          <Link to="/dashboard" className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group ${isActive('/dashboard')}`}>
+            <span className="material-icons text-[20px] group-hover:scale-110 transition-transform">dashboard</span>
             <span>Dashboard</span>
           </Link>
-          <Link to="/backups" className={`flex items-center space-x-3 px-4 py-2 rounded-lg font-medium transition-colors ${isActive('/backups')}`}>
-            <span className="material-icons">backup</span>
+          <Link to="/backups" className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 group ${isActive('/backups')}`}>
+            <span className="material-icons text-[20px] group-hover:scale-110 transition-transform">backup</span>
             <span>Backups</span>
           </Link>
-          <button onClick={logout} className="flex items-center space-x-3 px-4 py-2 rounded-lg font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors text-left w-full">
-            <span className="material-icons">logout</span>
-            <span>Logout</span>
-          </button>
         </nav>
+
+        {/* User / Logout */}
+        <div className="pt-6 border-t border-white/5">
+            <button onClick={logout} className="flex items-center space-x-3 px-4 py-3 rounded-xl font-medium text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all w-full group">
+                <span className="material-icons text-[20px] group-hover:-translate-x-1 transition-transform">logout</span>
+                <span>Sign Out</span>
+            </button>
+        </div>
       </aside>
-      <main className="flex-1 p-8 overflow-y-auto text-slate-900 dark:text-slate-100">
-        {children}
+
+      {/* Main Content */}
+      <main className="flex-1 p-8 overflow-y-auto overflow-x-hidden relative">
+        {/* Decorative background glow */}
+        <div className="fixed top-0 left-1/4 w-full h-96 bg-red-500/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative z-10 pb-20">
+            {children}
+        </div>
       </main>
     </div>
   );
