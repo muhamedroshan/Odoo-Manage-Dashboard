@@ -1,0 +1,35 @@
+2025-11-25 13:35:17,618 14708 WARNING ? odoo.tools.config: missing --http-interface/http_interface, using 0.0.0.0 by default, will change to 127.0.0.1 in 20.0 
+2025-11-25 13:35:17,619 14708 INFO ? odoo: Odoo version 19.0 
+2025-11-25 13:35:17,619 14708 INFO ? odoo: Using configuration file at c:\users\lenovo317\documents\odoo\odoo19\conf\odoo.conf 
+2025-11-25 13:35:17,620 14708 INFO ? odoo: addons paths: _NamespacePath(['C:\\Users\\LENOVO317\\Documents\\Odoo\\odoo19\\odoo\\addons', 'C:\\Users\\LENOVO317\\Documents\\Odoo\\odoo19\\odoo\\addons', 'C:\\Users\\LENOVO317\\AppData\\Local\\OpenERP S.A.\\Odoo\\addons\\19.0', 'c:\\users\\lenovo317\\documents\\odoo\\odoo19\\addons', 'c:\\users\\lenovo317\\documents\\odoo\\odoo19\\enterprise\\odoo-19.0+e.20251001\\odoo\\addons', 'c:\\users\\lenovo317\\documents\\odoo\\odoo19\\custom']) 
+2025-11-25 13:35:17,620 14708 INFO ? odoo: database: odoo19@172.31.72.171:5432 
+2025-11-25 13:35:18,488 14708 WARNING ? odoo.service.server: 'watchdog' module not installed. Code autoreload feature is disabled 
+2025-11-25 13:35:18,501 14708 INFO ? odoo.service.server: HTTP service (werkzeug) running on DESKTOP-DMDEDO2:8018 
+2025-11-25 13:35:18,774 14708 INFO db_afs_terminal_test odoo.modules.loading: loading 1 modules... 
+2025-11-25 13:35:18,784 14708 INFO db_afs_terminal_test odoo.modules.loading: 1 modules loaded in 0.01s, 0 queries (+0 extra) 
+2025-11-25 13:35:18,876 14708 INFO db_afs_terminal_test odoo.modules.loading: updating modules list 
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+INFO: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+WARNING: Test log entry
+INFO: Test log entry

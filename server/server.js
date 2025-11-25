@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const { Tail } = require('tail');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
@@ -85,24 +86,60 @@ app.get('/api/backups/download/:filename', verifyToken, (req, res) => {
 });
 
 // --- WebSocket: Live Logs ---
-// Tail the log file effectively
-const tailLogs = () => {
-    const logPath = process.env.LOG_FILE_PATH;
-    if (!fs.existsSync(logPath)) fs.writeFileSync(logPath, ""); // Create if missing
+const LOG_FILE_PATH = process.env.LOG_FILE_PATH || './dummy_odoo.log';
 
-    // Use tail -f logic (works best on Linux/Mac)
-    const tail = spawn('tail', ['-f', '-n', '20', logPath]);
-
-    tail.stdout.on('data', (data) => {
-        io.emit('log_update', data.toString());
-    });
-
-    tail.stderr.on('data', (data) => {
-        io.emit('log_update', `[SYSTEM ERROR]: ${data.toString()}`);
-    });
+// Helper: Read last N lines for new connections
+const readLastLines = (filePath, maxLines) => {
+    if (!fs.existsSync(filePath)) return [];
+    try {
+        const content = fs.readFileSync(filePath, 'utf8');
+        const lines = content.split('\n');
+        return lines.slice(-maxLines); // Get last N lines
+    } catch (e) {
+        return [];
+    }
 };
 
-tailLogs();
+// 1. Handle New Connections (Send History)
+io.on('connection', (socket) => {
+    console.log(`User Connected: ${socket.id}`);
+    
+    // Send existing logs immediately upon connection
+    socket.on('request_logs', () => {
+        const history = readLastLines(LOG_FILE_PATH, 50);
+        socket.emit('log_update', history);
+    });
+});
+
+// 2. Handle Live Updates (Watch for NEW lines)
+const startLogWatcher = () => {
+    if (!fs.existsSync(LOG_FILE_PATH)) {
+        fs.writeFileSync(LOG_FILE_PATH, "[SYSTEM] Log file created.\n");
+    }
+
+    try {
+        console.log(`Watching logs at: ${LOG_FILE_PATH}`);
+        const tail = new Tail(LOG_FILE_PATH, {
+            useWatchFile: true, // Force using fs.watchFile (polling)
+            fsWatchOptions: { interval: 500 }, // Check every 500ms
+            follow: true // Keep looking for new lines
+        });
+
+        tail.on("line", (data) => {
+            // Broadcast new line to all connected clients
+            // We trim to avoid extra empty lines, but it's optional
+            if(data) io.emit('log_update', data); 
+        });
+
+        tail.on("error", (error) => {
+            console.error('Tail error:', error);
+        });
+    } catch (error) {
+        console.error("Could not start log watcher:", error);
+    }
+};
+
+startLogWatcher();
 
 server.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

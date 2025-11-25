@@ -3,41 +3,78 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
-const socket = io('http://localhost:5000');
+// Initialize socket outside
+const socket = io('http://localhost:5000', {
+    transports: ['websocket', 'polling']
+});
 
 const Dashboard = () => {
   const [logs, setLogs] = useState([]);
   const [modal, setModal] = useState({ show: false, output: '' });
   const logsEndRef = useRef(null);
-  const logContainerRef = useRef(null);
   const { token } = useContext(AuthContext);
+  const isAtBottomRef = useRef(true);
 
-  // Log Highlighting
+  // Log Highlighting Helper
   const formatLog = (line) => {
+    if (!line) return null;
     if (line.includes('ERROR') || line.includes('Traceback')) return <span className="text-red-500">{line}</span>;
     if (line.includes('WARNING')) return <span className="text-yellow-400">{line}</span>;
     return <span className="text-slate-300">{line}</span>;
   };
 
-  // Smart Scroll Logic
-  useEffect(() => {
-    const container = logContainerRef.current;
-    if (!container) return;
-    
-    // Check if user is near bottom
-    const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 100;
+  // --- SINGLE CLEAN USE EFFECT ---
+  // ... inside Dashboard.jsx ...
 
-    if (isNearBottom) {
-      logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  useEffect(() => {
+    // 1. Debug Connection
+    socket.on('connect', () => {
+        console.log("✅ Socket Connected:", socket.id);
+        // Optional: Request logs again if we reconnect
+        socket.emit('request_logs'); 
+    });
+
+    socket.on('connect_error', (err) => {
+        console.error("❌ Socket Error:", err);
+    });
+
+    // 2. Receive Logs
+    socket.on('log_update', (data) => {
+        console.log("Log received:", data); 
+
+        setLogs((prev) => {
+            if (Array.isArray(data)) {
+                return [...prev, ...data].slice(-500);
+            }
+            return [...prev, data].slice(-500);
+        });
+    });
+
+    // --- THE FIX IS HERE ---
+    // 3. Explicitly ask for logs when this component mounts
+    socket.emit('request_logs');
+
+    return () => {
+        socket.off('connect');
+        socket.off('connect_error');
+        socket.off('log_update');
+    };
+  }, []);
+  
+  // 2. NEW: Handle user scrolling manually
+  const handleScroll = (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    // Check if user is within 50px of the bottom
+    const isNearBottom = scrollHeight - (scrollTop + clientHeight) < 50;
+    isAtBottomRef.current = isNearBottom;
+  };
+
+  // 3. UPDATED: Scroll effect only runs if user was already at bottom
+  useEffect(() => {
+    if (isAtBottomRef.current) {
+        logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [logs]);
-
-  useEffect(() => {
-    socket.on('log_update', (data) => {
-      setLogs((prev) => [...prev, data].slice(-500)); // Keep last 500 lines
-    });
-    return () => socket.off('log_update');
-  }, []);
 
   const executeScript = async (type) => {
     try {
@@ -67,16 +104,21 @@ const Dashboard = () => {
       </div>
 
       <div>
-        <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Live Server Logs</h2>
-        <div ref={logContainerRef} className="bg-black text-white font-mono text-sm rounded-lg p-6 h-96 overflow-y-auto whitespace-pre-wrap shadow-inner border border-slate-800">
-          {logs.map((log, index) => (
-            <div key={index}>{formatLog(log)}</div>
-          ))}
-          <div ref={logsEndRef} />
-        </div>
+          <h2 className="text-2xl font-semibold mb-4 text-slate-700 dark:text-slate-300">Live Server Logs</h2>
+          <div 
+            onScroll={handleScroll} 
+            className="bg-black text-white font-mono text-sm rounded-lg p-6 h-96 overflow-y-auto whitespace-pre-wrap shadow-inner border border-slate-800"
+          >
+              {logs.length === 0 && <p className="text-gray-500">Waiting for logs...</p>}
+              {logs.map((log, index) => (
+                  <div key={index} className="break-all block mb-1">
+                      {formatLog(log)}
+                  </div>
+              ))}
+              <div ref={logsEndRef} />
+          </div>
       </div>
 
-      {/* Modal for Script Output */}
       {modal.show && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg max-w-2xl w-full mx-4 shadow-xl">
