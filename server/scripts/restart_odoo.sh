@@ -1,0 +1,1 @@
+echo 'Restarting Odoo... Done'
