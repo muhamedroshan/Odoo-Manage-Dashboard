@@ -4,7 +4,7 @@ import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 
 // Initialize socket outside
-const socket = io('http://localhost:5000', {
+const socket = io('/', {
     transports: ['websocket', 'polling']
 });
 
@@ -63,7 +63,7 @@ const Dashboard = () => {
 
   const executeScript = async (type) => {
     try {
-      const res = await axios.post('http://localhost:5000/api/execute', 
+      const res = await axios.post('/api/execute', 
         { type }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );

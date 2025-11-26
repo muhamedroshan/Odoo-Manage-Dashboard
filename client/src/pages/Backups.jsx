@@ -24,7 +24,7 @@ const Backups = () => {
   const handleDownload = async (filename) => {
      try {
         const response = await axios({
-            url: `http://localhost:5000/api/backups/download/${filename}`,
+            url: `/api/backups/download/${filename}`,
             method: 'GET',
             responseType: 'blob',
             headers: { Authorization: `Bearer ${token}` }
