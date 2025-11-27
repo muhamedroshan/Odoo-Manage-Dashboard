@@ -6,13 +6,13 @@ package-lock.json
 yarn.lock
 
 # Environment variables
-#.env
+.env
 .env.local
 .env.*.local
 
 # Build outputs
 /server/dist/
-#/server/scripts/
+/server/scripts/
 /server/build/
 /client/build/
 /client/dist/
