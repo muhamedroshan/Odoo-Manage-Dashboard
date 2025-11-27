@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+const serverURL = import.meta.env.SERVER_URI;
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -13,7 +14,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('/api/login', { username, password });
+      const res = await axios.post(`${serverURL}/api/login`, { username, password });
       login(res.data.token);
       navigate('/dashboard');
     } catch (err) {

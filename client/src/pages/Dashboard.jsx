@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
+const serverURL = import.meta.env.SERVER_URI;
 
 // Initialize socket outside
-const socket = io('/', {
+const socket = io(`${serverURL}/`, {
     transports: ['websocket', 'polling']
 });
 
@@ -63,7 +64,7 @@ const Dashboard = () => {
 
   const executeScript = async (type) => {
     try {
-      const res = await axios.post('/api/execute', 
+      const res = await axios.post(`${serverURL}/api/execute`, 
         { type }, 
         { headers: { Authorization: `Bearer ${token}` } }
       );

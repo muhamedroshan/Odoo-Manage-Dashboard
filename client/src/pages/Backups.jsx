@@ -2,6 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { format } from 'date-fns';
+const serverURL = import.meta.env.SERVER_URI;
 
 const Backups = () => {
   const [backups, setBackups] = useState([]);
@@ -10,7 +11,7 @@ const Backups = () => {
   useEffect(() => {
     const fetchBackups = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/backups', {
+        const res = await axios.get(`${serverURL}/api/backups`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         setBackups(res.data);
@@ -24,7 +25,7 @@ const Backups = () => {
   const handleDownload = async (filename) => {
      try {
         const response = await axios({
-            url: `/api/backups/download/${filename}`,
+            url: `${serverURL}/api/backups/download/${filename}`,
             method: 'GET',
             responseType: 'blob',
             headers: { Authorization: `Bearer ${token}` }

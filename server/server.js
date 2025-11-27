@@ -51,7 +51,7 @@ app.post('/api/execute', verifyToken, (req, res) => {
 
   if (!scriptPath) return res.status(400).json({ message: "Unknown script type" });
 
-  exec(`sh ${scriptPath}`, (error, stdout, stderr) => {
+  exec(`sudo ${scriptPath}`, (error, stdout, stderr) => {
     if (error) {
       return res.json({ success: false, output: stderr || error.message });
     }

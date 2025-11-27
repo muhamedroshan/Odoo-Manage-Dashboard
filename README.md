@@ -1,16 +1,17 @@
-# Server Management Dashboard (Wedo Technologies)
+# Server Management Dashboard
 
 A full-stack application designed to remotely monitor server logs, manage backups, and execute maintenance scripts for Odoo (or any Linux service). Built with **Node.js**, **Express**, **Socket.io**, and **React (Vite + Tailwind CSS v4)**.
 
 ![Status](https://img.shields.io/badge/Status-Active-success)
 ![Stack](https://img.shields.io/badge/Stack-MERN-blue)
 ![Tailwind](https://img.shields.io/badge/Style-Tailwind_v4-cyan)
+![Security](https://img.shields.io/badge/Security-Sudoers_Config-red)
 
 ## 📋 Features
 
 * **Secure Login**: JWT-based authentication using environment variables.
 * **Live Log Monitoring**: Real-time server log streaming via WebSockets (Socket.io) with "Smart Scroll" and syntax highlighting.
-* **Remote Actions**: Execute shell scripts (e.g., Git Pull, Service Restart) from the UI.
+* **Privileged Remote Actions**: Securely execute **Git Pull** and **System Service Restarts** from the UI without exposing root access, utilizing `visudo` configuration.
 * **Backup Management**: View, track, and securely download server backup files.
 * **Modern UI**: Dark-themed, glassmorphism design using Tailwind CSS v4.
 
@@ -26,14 +27,42 @@ server-manager/
 │   │   ├── context/        # Auth Context
 │   │   ├── pages/          # Login, Dashboard, Backups
 │   │   └── index.css       # Global styles & Tailwind @theme
-│   └── vite.config.js      # Vite config (includes Tailwind plugin)
+│   └── vite.config.js      # Vite config
 ├── server/                 # Node.js Backend
 │   ├── backups/            # Directory for storing/serving backups
-│   ├── scripts/            # Shell scripts (pull, restart)
+│   ├── scripts/            # Shell scripts
+│   │   ├── git_update.sh       # <--- Pulls changes from GitHub
+│   │   └── restart_service.sh  # <--- Restarts systemctl service
 │   ├── server.js           # Main entry point (API + WebSockets)
 │   └── .env                # Secrets and configuration
 └── README.md
 ````
+
+-----
+
+## 🔐 Security & Script Configuration (Crucial)
+
+**Do not run this application as root.** Instead, we configure the server to allow the specific Node.js user to run only specific scripts with `sudo` privileges without a password.
+
+### 1\. Create the Scripts [Sample script is included in /server/scripts]
+
+Ensure your scripts exist and are executable:
+
+```bash
+chmod +x /home/ubuntu/scripts/git_update.sh
+chmod +x /home/ubuntu/scripts/restart_service.sh
+```
+
+### 2\. Configure `visudo`
+
+Allow the user (e.g., `ubuntu`) to run these specific files as root without a password prompt.
+
+1.  Open the editor: `sudo visudo`
+2.  Add these lines to the bottom:
+    ```text
+    ubuntu ALL=(ALL) NOPASSWD: /home/ubuntu/scripts/git_update.sh
+    ubuntu ALL=(ALL) NOPASSWD: /home/ubuntu/scripts/restart_service.sh
+    ```
 
 -----
 
@@ -49,7 +78,7 @@ server-manager/
     ```bash
     npm install
     ```
-3.  Create a `.env` file in the `server/` root:
+3.  Create a `.env` file in the `server/` root. **Note: Use absolute paths for scripts.**
     ```env
     PORT=5000
     # Security
@@ -60,19 +89,10 @@ server-manager/
     # Paths (Adjust these for your local machine)
     BACKUP_DIR=./backups
     LOG_FILE_PATH=./dummy_odoo.log
-    SCRIPT_PULL=./scripts/pull_changes.sh
-    SCRIPT_RESTART=./scripts/restart_odoo.sh
-    ```
-4.  **Mock Data (Optional):** Create dummy scripts and log files to test functionality locally.
-    ```bash
-    mkdir scripts backups
-    echo "echo 'Simulating Git Pull... Success'" > scripts/pull_changes.sh
-    echo "echo 'Simulating Odoo Restart... Success'" > scripts/restart_odoo.sh
-    echo "[INFO] Server started..." > dummy_odoo.log
-    ```
-5.  Start the server:
-    ```bash
-    node server.js
+
+    # Scripts (Must be absolute paths in Production)
+    SCRIPT_PULL=/home/ubuntu/scripts/git_update.sh
+    SCRIPT_RESTART=/home/ubuntu/scripts/restart_service.sh
     ```
 
 ### 2\. Frontend Setup (React + Tailwind v4)
@@ -80,15 +100,12 @@ server-manager/
 1.  Navigate to the client directory:
     ```bash
     cd ../client
-    ```
-2.  Install dependencies:
-    ```bash
     npm install
-3.  Start the development server:
+    ```
+2.  Start the development server:
     ```bash
     npm run dev
     ```
-4.  Access the app at `http://localhost:5173`.
 
 -----
 
@@ -99,25 +116,20 @@ server-manager/
 1.  Clone repo and install dependencies.
 2.  Update `.env` with **production paths**:
     ```env
-    BACKUP_DIR=/var/lib/odoo/.local/share/Odoo/backups/
+    # Logs
     LOG_FILE_PATH=/var/log/odoo/odoo-server.log
-    SCRIPT_RESTART=/home/ubuntu/scripts/restart_odoo.sh
+    BACKUP_DIR=/var/lib/odoo/.local/share/Odoo/backups/
+
+    # Script Paths (Must match what is in 'visudo')
+    SCRIPT_PULL=/home/ubuntu/scripts/git_update.sh
+    SCRIPT_RESTART=/home/ubuntu/scripts/restart_service.sh
     ```
 3.  Run with PM2:
     ```bash
     pm2 start server.js --name "server-dashboard"
     ```
 
-### Step 2: Deploy Frontend
-
-1.  Build the static files:
-    ```bash
-    cd client
-    npm run build
-    ```
-2.  Serve the `dist/` folder using Nginx.
-
-### Step 3: Nginx Configuration
+### Step 2: Nginx Configuration
 
 Use this block to proxy API requests and WebSockets correctly.
 
@@ -147,28 +159,18 @@ server {
 
 -----
 
-## 🛠 Troubleshooting & Known Issues
+## 🛠 Troubleshooting
 
-### 1\. Live Logs Not Updating (Windows/WSL)
+### 1\. Script Execution Fails ("Permission Denied")
 
-  * **Issue:** The log viewer is blank or only updates on refresh.
-  * **Cause:** Windows file systems often don't trigger standard `fs.watch` events reliably for appended logs.
-  * **Solution:** The backend is configured to use **polling** (`useWatchFile: true`) in `server.js`. This ensures compatibility across Windows and Linux.
+  * **Check 1:** Ensure the script file is executable: `chmod +x path/to/script.sh`.
+  * **Check 2:** Ensure the path in `.env` exactly matches the path in `/etc/sudoers` (visudo).
+  * **Check 3:** Ensure you are using `sudo` in your Node.js `exec` call (e.g., `exec('sudo ' + scriptPath)`).
 
-### 2\. Styles Not Loading (White Background)
+### 2\. Live Logs Not Updating (Windows/WSL)
 
-  * **Issue:** The screen is white, and dark mode isn't working.
-  * **Cause:** Incorrect Tailwind setup. This project uses **Tailwind v4**.
-  * **Solution:** \* Delete `tailwind.config.js` and `postcss.config.js` from `client/`.
-      * Verify `src/index.css` starts with `@import "tailwindcss";`.
-      * Restart Vite (`npm run dev`) to clear the CSS cache.
-
-### 3\. Script Execution Fails
-
-  * **Issue:** Clicking "Restart Service" returns a permission error.
-  * **Solution:** The Node.js process needs permission to run the shell script.
-      * Run `chmod +x scripts/restart_odoo.sh`.
-      * If using `systemctl`, add the user to `visudo` for passwordless execution.
+  * **Cause:** Windows file systems often don't trigger standard `fs.watch` events reliably.
+  * **Solution:** The backend is configured to use **polling** (`useWatchFile: true`) in `server.js`.
 
 <!-- end list -->
 

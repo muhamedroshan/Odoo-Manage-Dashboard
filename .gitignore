@@ -12,6 +12,7 @@ yarn.lock
 
 # Build outputs
 /server/dist/
+#/server/scripts/
 /server/build/
 /client/build/
 /client/dist/
