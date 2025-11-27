@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-const serverURL = import.meta.env.SERVER_URI;
+const serverURL = import.meta.env.VITE_SERVER_URI;
 
 const Login = () => {
   const [username, setUsername] = useState('');
@@ -15,6 +15,7 @@ const Login = () => {
     e.preventDefault();
     try {
       const res = await axios.post(`${serverURL}/api/login`, { username, password });
+      console.log(`${serverURL}/api/login`);
       login(res.data.token);
       navigate('/dashboard');
     } catch (err) {

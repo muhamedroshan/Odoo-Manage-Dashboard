@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-const serverURL = import.meta.env.SERVER_URI;
+const serverURL = import.meta.env.VITE_SERVER_URI;
 
 // Initialize socket outside
 const socket = io(`${serverURL}/`, {

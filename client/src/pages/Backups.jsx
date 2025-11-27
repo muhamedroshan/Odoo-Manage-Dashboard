@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { format } from 'date-fns';
-const serverURL = import.meta.env.SERVER_URI;
+const serverURL = import.meta.env.VITE_SERVER_URI;
 
 const Backups = () => {
   const [backups, setBackups] = useState([]);
